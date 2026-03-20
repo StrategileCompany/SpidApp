@@ -9,20 +9,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Status**: MVP funcional deployado. Web + API em produção no Vercel, banco Neon Postgres, APK Android gerado.
 
 **URLs de Produção**:
-- Web/API: `https://spid-web-six.vercel.app`
+
+- Web/API: `https://xpid.vercel.app`
 - Neon Project: `super-smoke-72989991` (org: `org-bitter-brook-21514304`)
 
 ## Stack
 
-| Camada | Tecnologia |
-|--------|-----------|
+| Camada           | Tecnologia                                    |
+| ---------------- | --------------------------------------------- |
 | Mobile (Android) | React + TypeScript + Capacitor + SQLite local |
-| Web (PC) | Next.js (React + TypeScript) |
-| Backend/API | Next.js API Routes (migrado de Fastify) |
-| ORM | Prisma |
-| Banco | Neon Postgres |
-| Validação | Zod |
-| Monorepo | pnpm workspaces |
+| Web (PC)         | Next.js (React + TypeScript)                  |
+| Backend/API      | Next.js API Routes (migrado de Fastify)       |
+| ORM              | Prisma                                        |
+| Banco            | Neon Postgres                                 |
+| Validação        | Zod                                           |
+| Monorepo         | pnpm workspaces                               |
 
 ## Estrutura do Monorepo
 
@@ -72,6 +73,7 @@ npx cap sync android      # sync Capacitor
 ## Arquitetura Core
 
 ### Offline-First (padrão central)
+
 1. Mobile escreve no **SQLite local** + gera registro em `outbox_operations` com `operationId` (UUID)
 2. Quando online → `POST /sync/push` envia operações pendentes
 3. Backend aplica em transação, rejeita duplicatas por `operationId`
@@ -79,21 +81,25 @@ npx cap sync android      # sync Capacitor
 5. Mobile aplica no SQLite local
 
 ### Resolução de Conflitos
+
 - **Cadastros** (produtos, clientes, fornecedores): Last-Write-Wins por `updatedAt`
 - **Movimentações** (estoque, financeiro): Append-only + idempotência. Nunca editar movimento; corrigir com movimento de ajuste
 
 ### Estoque e Financeiro como Eventos
+
 - Saldo de estoque = Σ(entradas) - Σ(saídas) em **unidade base** (inteiro)
 - Saldo financeiro por conta = Σ(entradas) - Σ(saídas)
 - Proibido editar saldo diretamente; usar ajuste/inventário/lançamento
 
 ### Conversão de Unidades (o "problema do ovo")
+
 - Todo estoque armazenado em **unidade base** (ex: 1 ovo)
 - Cada produto define unidades vendáveis com fator configurável:
   - Bandeja = 12, Cartela = 30, Caixa = 360 (ou 240, configurável por fornecedor)
 - Compra e venda convertem para base automaticamente
 
 ### Método de Custo (configurável em Settings)
+
 - **FIFO** (padrão): compras geram lotes (`cost_lots`); vendas consomem na ordem
 - **Custo Médio**: recalcula após cada entrada; COGS usa custo médio vigente
 
