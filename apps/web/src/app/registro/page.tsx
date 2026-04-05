@@ -80,7 +80,7 @@ export default function RegistroPage() {
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               required
-              placeholder="Ex: Ovos do Geraldo"
+              placeholder="Ex: Distribuidora Xpid"
               style={{
                 width: '100%',
                 padding: inputPadding,

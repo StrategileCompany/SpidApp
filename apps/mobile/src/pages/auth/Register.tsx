@@ -108,7 +108,7 @@ export function RegisterPage({ onRegister, onGoToLogin }: RegisterPageProps) {
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               required
-              placeholder="Ex: Ovos do Geraldo"
+              placeholder="Ex: Distribuidora Xpid"
               style={inputStyle}
             />
           </div>
