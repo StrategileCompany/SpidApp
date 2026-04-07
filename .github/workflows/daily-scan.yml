@@ -1,0 +1,57 @@
+# =============================================
+# ClusterOS Daily Scan Workflow
+# Copy this to .github/workflows/daily-scan.yml in each project
+# =============================================
+name: Daily Scan
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # 6 AM UTC (3 AM BRT)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  issues: write
+
+jobs:
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Semgrep SAST
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/typescript
+            p/security-audit
+            p/owasp-top-ten
+
+  dependencies:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npm audit --audit-level=high || true
+
+  # Uncomment when ANTHROPIC_API_KEY is configured
+  # ai-review:
+  #   name: AI Code Review
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #     - uses: anthropics/claude-code-action@v1
+  #       with:
+  #         anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+  #         prompt: |
+  #           Review commits from the last 24 hours.
+  #           Focus on: security issues, bugs, code quality.
+  #           If issues found, create a GitHub issue summarizing them.
