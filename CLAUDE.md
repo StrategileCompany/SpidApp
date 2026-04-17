@@ -1,5 +1,8 @@
 # CLAUDE.md
 
+
+> 📐 Normas corporativas em [.clusteros/STANDARDS.md](./.clusteros/STANDARDS.md) — leia antes de agir.
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Projeto
